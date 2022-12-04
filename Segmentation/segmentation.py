@@ -2,8 +2,7 @@ import cv2
 import numpy as np
 import os
 
-path = "C:/Users/giorgia.darmiento/Desktop/UNI/BiometricSystems/Bozza segmentation/CASIA1/2/002_1_1.jpg"
-print(path)
+path = "Dataset/CASIA1/2/002_1_1.jpg"
 image_read = cv2.imread(path)
 output = image_read.copy()
 image_test = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
