@@ -30,14 +30,14 @@ def brute_force_match(iris_1, iris_2):
 
 veri = 0
 falsi = 0
-for x in range(46):
+for x in range(108):
     
-    files = os.listdir('MMUIrisDatabase/MMU Iris Database/'+str(x+1)+"/left")
+    files = os.listdir('Dataset/CASIA1/'+str(x+1))
     
     if len(files) > 0:
 
-        image_1 = cv2.imread('MMUIrisDatabase/MMU Iris Database/'+str(x+1)+'/left/'+files[0])
-        image_2 = cv2.imread('MMUIrisDatabase/MMU Iris Database/'+str(x+1)+'/left/'+files[2])
+        image_1 = cv2.imread('Dataset/CASIA1/'+str(x+1)+'/'+files[0])
+        image_2 = cv2.imread('Dataset/CASIA1/'+str(x+1)+'/'+files[2])
         print(x+1)
         bf_result = brute_force_match(image_1, image_2)
         if (bf_result):
