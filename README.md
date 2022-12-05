@@ -25,11 +25,11 @@ Contenuto delle cartelle:
     • normalization.py:          divide l'immagine dell'occhio in rettangoli e salva le immagini frammentate nella dir CASIA_Iris_interval_norm
 
 • CASIA_Iris_interval_norm:
+    •     contiene i risultati delle immagini normalizzate organizzate nelle corrispondenti cartelle del database di partenza CASIA1
     
-    • SimilarityImage.py         restiruisce un testo indicante il livello di somiglianza tra due immagini e degli indicatori relativi
 • Code:
     
-    • normalization.py:       
+    • SimilarityImage.py         restiruisce un testo indicante il livello di somiglianza tra due immagini e degli indicatori relativi
 
 
 
