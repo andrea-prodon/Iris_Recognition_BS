@@ -20,5 +20,18 @@ Contenuto delle cartelle:
     • segmentation.py:          segmenta l'immagine dell'occhio, andando a cerchiare l'iride e la pupilla
     • segmentation_match.py:    utilizza gli stessi metodi della classe precedente per segmentare 2 occhi e successivamente confrontarli
 
+• Normalization
+
+    • normalization.py:          divide l'immagine dell'occhio in rettangoli e salva le immagini frammentate nella dir CASIA_Iris_interval_norm
+
+• CASIA_Iris_interval_norm:
+
+    •     contiene i risultati delle immagini normalizzate organizzate nelle corrispondenti cartelle del database di partenza CASIA1
+    
+• Code:
+    
+    • SimilarityImage.py         restiruisce un testo indicante il livello di somiglianza tra due immagini e degli indicatori relativi
+
+
 
 Tutte le classi sono al momento indipendenti ed eseguibili in modo a se stante
