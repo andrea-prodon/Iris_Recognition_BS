@@ -25,6 +25,7 @@ Contenuto delle cartelle:
     • normalization.py:          divide l'immagine dell'occhio in rettangoli e salva le immagini frammentate nella dir CASIA_Iris_interval_norm
 
 • CASIA_Iris_interval_norm:
+
     •     contiene i risultati delle immagini normalizzate organizzate nelle corrispondenti cartelle del database di partenza CASIA1
     
 • Code:
