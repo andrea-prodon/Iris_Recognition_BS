@@ -5,8 +5,9 @@ import math
 import numpy as np
 import os
 
-input_img_path = "Dataset/CASIA1"
-output_path = "Dataset/CASIA_Iris_interval_norm"
+input_img_path = "Dataset/1/left"
+
+output_path = "Dataset/1/left/norm"
 iris_circle = [0, 0, 0]
 
 def bottom_hat_median_blurr(image):
@@ -124,8 +125,8 @@ for (path, dir, files) in os.walk(input_img_path):
     
 #	if not(os.path.isdir(output_path+ path.split("MMU_Iris_Database")[1])):
 #		os.mkdir(output_path +path.split("MMU_Iris_Database")[1])
-    if not(os.path.isdir(output_path+ path.split("CASIA1")[1])):
-        os.mkdir(output_path +path.split("CASIA1")[1])
+    # if not(os.path.isdir(output_path+ path.split("CASIA1")[1])):
+    #     os.mkdir(output_path +path.split("CASIA1")[1])
     for filename in files:
         ext = os.path.splitext(filename)[-1]
         if ((ext == '.bmp') or (ext == '.jpg')):
@@ -147,7 +148,7 @@ for (path, dir, files) in os.walk(input_img_path):
                 continue
             #print(frame.shape)
             #cv.imshow("normalized", norm_frame)
-            cv.imwrite(output_path + path.split("CASIA1")[1] + "/" + filename, norm_frame)
+            cv.imwrite(output_path + "/" + filename, norm_frame)
 
             key = cv.waitKey(1000)
             if (key == 27 or key == 1048603):
