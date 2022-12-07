@@ -42,7 +42,7 @@ cv2.waitKey(0)
 
 # SEGMENTATION IMAGE 2
 
-path = "Dataset/CASIA1/47/047_1_1.jpg"
+path = "Dataset/CASIA1/47/047_1_2.jpg"
 
 image_read = cv2.imread(path)
 output = image_read.copy()
