@@ -5,8 +5,8 @@ import math
 import numpy as np
 import os
 
-input_img_path = "C:/Users/giorgia.darmiento/Desktop/UNI/BiometricSystems/Iris_Recognition_BS/Dataset/CASIA1"
-output_path = "C:/Users/giorgia.darmiento/Desktop/UNI/BiometricSystems/Iris_Recognition_BS/CASIA_Iris_interval_norm"
+input_img_path = "Dataset/CASIA1"
+output_path = "Dataset/CASIA_Iris_interval_norm"
 iris_circle = [0, 0, 0]
 
 def bottom_hat_median_blurr(image):
