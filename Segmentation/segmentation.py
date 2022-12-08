@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import os
 
-path = "Dataset/1/left/aeval1.bmp"
+path = "Dataset/CASIA1/47/047_1_1.jpg"
 image_read = cv2.imread(path)
 output = image_read.copy()
 cv2.imshow("original", image_read)

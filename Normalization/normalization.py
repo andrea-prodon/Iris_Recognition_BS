@@ -1,11 +1,9 @@
-
-
 import cv2 as cv
 import math
 import numpy as np
 import os
 
-input_img_path = "Dataset/1/left"
+input_img_path = "Dataset/CASIA1/left"
 
 output_path = "Dataset/1/left/norm"
 iris_circle = [0, 0, 0]
