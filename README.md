@@ -27,11 +27,6 @@ Contenuto delle cartelle:
 • CASIA_Iris_interval_norm:
 
     •     contiene i risultati delle immagini normalizzate organizzate nelle corrispondenti cartelle del database di partenza CASIA1
-    
-• Code:
-    
-    • SimilarityImage.py         restiruisce un testo indicante il livello di somiglianza tra due immagini e degli indicatori relativi
-
 
 
 Tutte le classi sono al momento indipendenti ed eseguibili in modo a se stante
