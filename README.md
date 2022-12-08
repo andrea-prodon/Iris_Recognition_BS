@@ -10,15 +10,18 @@ Contenuto delle cartelle:
 
 • Face Localization
 
-    • brute_force_match.py:     contiene un metodo che utilizza il brute force match di opencv per calcolare quanto due occhi siano simili tra loro
     • face_localization.py:     localizza la faccia e gli occhi tramite la fotocamera del pc
     • iris_localization.py:     localizza e presenta a video i due occhi zoomati, localizzati tramite fotocamera del pc
+
+• Iris Match (basse performance)
+
+    • brute_force_match.py:     contiene un metodo che utilizza il brute force match di opencv per calcolare quanto due occhi siano simili tra loro
     • iris_match.py:            utilizza un differente modo di calcolare la similitudine tra due immagini
+    • segmentation_match.py:    utilizza gli stessi metodi della classe precedente per segmentare 2 occhi e successivamente confrontarli
 
 • Segmentation
 
     • segmentation.py:          segmenta l'immagine dell'occhio, andando a cerchiare l'iride e la pupilla
-    • segmentation_match.py:    utilizza gli stessi metodi della classe precedente per segmentare 2 occhi e successivamente confrontarli
 
 • Normalization
 
