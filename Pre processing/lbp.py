@@ -24,7 +24,7 @@ def img_show(label: str,img: np.ndarray):
         cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    input_path = "Dataset/CASIA_Iris_interval_norm/1/"
+    input_path = "Dataset/CASIA1/1/"
     img = cv2.imread(os.path.join(input_path,os.listdir(input_path)[6]))
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     lbp_img, lbp_code = lbp(gray,24)
