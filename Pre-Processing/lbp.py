@@ -28,5 +28,6 @@ if __name__ == '__main__':
     img = cv2.imread(os.path.join(input_path,os.listdir(input_path)[6]))
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     lbp_img, lbp_code = lbp(gray,24)
+    print(lbp_code.shape)
     img_show('original', img)
     img_show('lbp', lbp_img)
