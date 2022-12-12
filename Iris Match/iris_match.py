@@ -2,11 +2,11 @@ import cv2
 import numpy as np
 import os
 
-path = 'Dataset/CASIA1/1/001_1_1.jpg'
+path = 'Dataset/CASIA_Iris_interval_norm/1/001_1_1.jpg'
 image_read = cv2.imread(path)
 original = image_read
 
-path = 'Dataset/CASIA1/1/001_1_1.jpg'
+path = 'Dataset/CASIA_Iris_interval_norm/1/001_1_1.jpg'
 image_read = cv2.imread(path)
 image_to_compare = image_read
 
