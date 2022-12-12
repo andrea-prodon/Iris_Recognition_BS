@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import tensorflow as tf
 import os
+from sklearn.model_selection import train_test_split
 
 def transform_to_np(path):
     image = cv2.imread(path)
@@ -27,6 +28,10 @@ for (path, dir, files) in os.walk(input_img_path):
 images = np.array(images)
 labels = np.array(labels)
 
+X_train, X_test, y_train, y_test = train_test_split(images,labels, 
+                          random_state=104,
+                          train_size=0.8, shuffle=True)
+
 model = tf.keras.Sequential()
 model.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(224, 224, 1)))
 model.add(tf.keras.layers.MaxPooling2D((2, 2)))
@@ -43,7 +48,7 @@ model.compile(optimizer='adam',
               metrics=['accuracy'])
 
 # Train the model
-model.fit(images, labels, epochs=5)
+model.fit(X_train, y_train, epochs=5)
 
 # Save the model
 model.save('iris_recognition_model.h5')
