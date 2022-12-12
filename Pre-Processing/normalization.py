@@ -81,7 +81,7 @@ def detect_iris_frame(frame):
         iris_circle[2] = frame.shape[0] - iris_circle[1]
     if frame.shape[1] - iris_circle[0] < iris_circle[2]:
         iris_circle[2] = frame.shape[1] - iris_circle[0]
-#	
+	
 
     mask = cv.bitwise_not(
                 cv.circle(np.zeros((np.size(frame,0),np.size(frame,1),1), np.uint8)
