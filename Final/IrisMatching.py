@@ -55,7 +55,7 @@ def CalcTest(train_features, train_classes, test_sample, test_class, dist):
 
 #classificare tutti i dati di test, 
 # calcolare l'accuratezza totale e le distanze 
-# di ogni coppia di dati di allenamento e dati di test.            
+# di ogni coppia di dati di train e dati di test.            
 def IrisMatching(train_features, train_classes, test_features, test_classes, dist):
     
     total = float(len(test_classes))
