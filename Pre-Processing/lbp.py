@@ -13,6 +13,7 @@ def lbp(image, npoint, radius=8, eps=1e-7):
     # normalize the histogram
     hist = hist.astype("float")
     hist /= (hist.sum() + eps)
+    print(hist)
     return lbp, hist
 
 
