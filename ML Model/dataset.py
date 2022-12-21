@@ -21,8 +21,10 @@ class IrisDataset(Dataset):
             self.transforms = transforms
             self.images, self.labels, self.length, self.num_classes = self.read_data_set()       
         
-    def __getitem__(self, index):
+    def __getitem__(self, index: int):
+            # shape: w, h
             image= self.images[index]
+            image = image.reshape(1, image.shape[0], image.shape[1])
             if self.transforms is not None:
                 image = self.transforms(Image.fromarray(np.uint8(image)))
             return {'image': image, 'label': self.labels[index]}
