@@ -4,10 +4,6 @@ import numpy as np
 from PIL import Image
 
 
-
-
-
-
 class IrisDataset(Dataset):
     def read_data_set(self):
         images, labels = self.estrazione_dataset()
@@ -24,7 +20,7 @@ class IrisDataset(Dataset):
     def __getitem__(self, index: int):
             # shape: w, h
             image= self.images[index]
-            image = image.reshape(1, image.shape[0], image.shape[1])
+            #image = image.reshape(1, image.shape[0], image.shape[1])
             if self.transforms is not None:
                 image = self.transforms(Image.fromarray(np.uint8(image)))
             return {'image': image, 'label': self.labels[index]}
@@ -35,14 +31,14 @@ class IrisDataset(Dataset):
     def estrazione_dataset(self):
         tipo = '_1_' if not self.train else '_2_'
         offset = 3 if not self.train else 4
-        features = np.zeros((self.n_samples*offset,360,80))
+        features = np.zeros((self.n_samples*offset,360,80,3))
         classes = np.zeros(self.n_samples*offset, dtype = np.uint8)
 
         for i in range(1,self.n_samples+1):
             filespath = self.data_set_path + str(i) + "/"
             for j in range(1,offset+1):
                 irispath = filespath + str(i).zfill(3) + tipo + str(j) + ".jpg"
-                ROI = cv2.imread(irispath, cv2.IMREAD_GRAYSCALE)
+                ROI = cv2.imread(irispath)#, cv2.IMREAD_GRAYSCALE)
                 #ROI = ImageEnhancement(irispath)
                 features[(i-1)*offset+j-1, :, :] = ROI
                 classes[(i-1)*offset+j-1] = i - 1
