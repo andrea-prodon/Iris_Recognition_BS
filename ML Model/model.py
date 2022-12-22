@@ -91,7 +91,7 @@ if __name__ == '__main__':
         print("error: Numbers of class in training set and test set are not equal")
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    device='cpu'
+    print(device)
     num_classes = train_data_set.num_classes
     custom_model = CustomConvNet(num_classes=num_classes).to(device)
 
