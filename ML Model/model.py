@@ -119,5 +119,3 @@ if __name__ == '__main__':
             print('predicted : ',predicted, '\nlabels : ',labels)
             correct += (predicted == labels).sum().item()
         print('Test Accuracy of the model on the {} test images: {} %'.format(total, 100 * correct / total))
-
-train_data = [train_dataset[i]['images'] for i in range(len(train_dataset))]
