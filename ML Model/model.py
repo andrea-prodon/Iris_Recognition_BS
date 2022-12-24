@@ -64,7 +64,7 @@ if __name__ == '__main__':
                                         transforms.ToTensor()])
 
   
-    samples = 50
+    samples = 10
     train_data_set = IrisDataset(data_set_path=rootpath, transforms=transforms_train, n_samples = samples)
     train_loader = DataLoader(train_data_set, batch_size=hyper_param_batch, shuffle=True)
 
@@ -75,7 +75,6 @@ if __name__ == '__main__':
         print("error: Numbers of class in training set and test set are not equal")
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    #device='cpu'
     num_classes = train_data_set.num_classes
     custom_model = CustomConvNet(num_classes=num_classes).to(device)
 
@@ -120,3 +119,5 @@ if __name__ == '__main__':
             print('predicted : ',predicted, '\nlabels : ',labels)
             correct += (predicted == labels).sum().item()
         print('Test Accuracy of the model on the {} test images: {} %'.format(total, 100 * correct / total))
+
+train_data = [train_dataset[i]['images'] for i in range(len(train_dataset))]
