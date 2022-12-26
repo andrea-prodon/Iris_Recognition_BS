@@ -1,4 +1,4 @@
-from keras.applications import VGG16
+from keras.applications.vgg16 import VGG16
 from keras.callbacks import ReduceLROnPlateau
 from tensorflow.keras import Model, optimizers
 from keras.layers import Input, Flatten, Dense, Dropout
@@ -7,7 +7,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Conv2D, MaxPool2D , Flatten
 from keras.preprocessing.image import ImageDataGenerator
 import numpy as np
-from keras.optimizers import Adam
+
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 import matplotlib.pyplot as plt
 from keras.preprocessing import image
@@ -27,7 +27,7 @@ os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 torch.backends.cudnn.enabled = False
 
 
-vgg_model = VGG16(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
+vgg_model = VGG16(weights='imagenet', include_top=False, input_shape=(360, 80,3))
 
 # Freeze four convolution blocks
 for layer in vgg_model.layers[:15]:
@@ -53,17 +53,18 @@ rootpath = "Dataset/CASIA_Iris_interval_norm/"
 transforms_train = transforms.Compose([transforms.Resize((360, 80)),
                                         transforms.RandomRotation(10.),
                                         transforms.ToTensor()])
-train_dataset = IrisDataset(data_set_path=rootpath, transforms=transforms_train, n_samples = 108)
-train_data = [train_dataset[i]['images'] for i in range(len(train_dataset))]
-
+train_dataset = IrisDataset(data_set_path=rootpath, transforms=None, n_samples = 108)
+train_data = np.array([train_dataset[i]['image'] for i in range(len(train_dataset))])
+print(train_data.shape)
+train_label = np.array([train_dataset[i]['label'] for i in range(len(train_dataset))])
 transforms_test = transforms.Compose([transforms.Resize((360, 80)),
                                         transforms.ToTensor()])
-test_dataset = IrisDataset(data_set_path=rootpath, transforms=transforms_test, train=False, n_samples=108)
-test_data = [test_dataset[i]['images'] for i in range(len(test_dataset))]
-
+test_dataset = IrisDataset(data_set_path=rootpath, transforms=None, train=False, n_samples=108)
+test_data = np.array([test_dataset[i]['image'] for i in range(len(test_dataset))])
+test_label = np.array([test_dataset[i]['label'] for i in range(len(test_dataset))])
 learning_rate= 5e-5
 transfer_model.compile(loss="categorical_crossentropy", optimizer=optimizers.Adam(lr=learning_rate), metrics=["accuracy"])
-history = transfer_model.fit(train_data, test_data, batch_size = 1, epochs=50, validation_data=(train_data,test_data), callbacks=[lr_reduce,checkpoint])
+history = transfer_model.fit(train_data, train_label, batch_size = 1, epochs=50, validation_data=(test_data,test_label), callbacks=[lr_reduce,checkpoint])
 
 
 for layer in vgg_model.layers[:15]:
@@ -82,8 +83,8 @@ for i, layer in enumerate(transfer_model.layers):
 #Augment images
 train_datagen = ImageDataGenerator(zoom_range=0.2, rotation_range=30, width_shift_range=0.2, height_shift_range=0.2, shear_range=0.2)
 #Fit augmentation to training images
-train_generator = train_datagen.flow(X_train,y_train,batch_size=1)
+train_generator = train_datagen.flow(train_data,train_label,batch_size=1)
 #Compile model
 transfer_model.compile(loss="categorical_crossentropy", optimizer='adam', metrics=["accuracy"])
 #Fit model
-history = transfer_model.fit_generator(train_generator, validation_data=(X_test,y_test), epochs=100, shuffle=True, callbacks=[lr_reduce],verbose=1)
+history = transfer_model.fit_generator(train_generator, validation_data=(test_data,test_label), epochs=100, shuffle=True, callbacks=[lr_reduce],verbose=1)
