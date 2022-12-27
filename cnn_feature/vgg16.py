@@ -138,20 +138,6 @@ for e in range(hyper_param_epoch):
 
 custom_model.eval()
 
-'''
-np.set_printoptions(threshold=np.inf)
-with open('/content/gdrive/My Drive/iris/some_file.txt', 'w') as f:
-  for name, param in custom_model.named_parameters():
-    if param.requires_grad:
-      print(param.data.shape)
-      f.write(name + " = ")
-      f.write("[")
-      for p in param.data:
-        f.write(str(p.cpu().numpy()))
-        f.write(",")
-      f.write("]")
-      f.write('\n')
-'''
 summary(custom_model, (3, 360, 80))
 
 with torch.no_grad():
