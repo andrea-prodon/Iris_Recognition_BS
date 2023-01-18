@@ -24,7 +24,7 @@ class IrisNotFoundException(Exception):
 
 @app.on_event("startup")
 def init_model() -> None:
-    app.model = joblib.load("model_cnn.py")
+    app.model = joblib.load("/Demo/model_cnn.py")
 
 
 
