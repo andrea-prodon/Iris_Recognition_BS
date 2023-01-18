@@ -12,6 +12,7 @@ from torchvision import transforms
 from Final.IrisLocalization import IrisLocalization
 from Final.IrisNormalization import IrisNormalization
 import joblib
+from cnn_feature.cnn_normal import CustomConvNet
 
 warnings.filterwarnings("ignore")
 
@@ -24,7 +25,7 @@ class IrisNotFoundException(Exception):
 
 @app.on_event("startup")
 def init_model() -> None:
-    app.model = joblib.load("/Demo/model_cnn.py")
+    app.model = torch.load("model_cnn.pth")
 
 
 
