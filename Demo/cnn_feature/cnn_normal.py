@@ -54,6 +54,7 @@ class CustomImageDataset(Dataset):
 
 class CustomConvNet(nn.Module): 
   def __init__(self, num_classes):
+    self.num_classes = num_classes
     super(CustomConvNet, self).__init__()
       
     self.layer1 = self.conv_module(1, 16)
@@ -70,7 +71,7 @@ class CustomConvNet(nn.Module):
     out = self.layer4(out)
     out = self.layer5(out)
     out = self.layer6(out)
-    out = out.view(-1, num_classes)
+    out = out.view(-1, self.num_classes)
     
     return out
   def conv_module(self, in_num, out_num):
@@ -87,72 +88,73 @@ class CustomConvNet(nn.Module):
       nn.LeakyReLU(),
       nn.AdaptiveAvgPool2d((1, 1)))
 
+if __name__ == "__main__":
 
-hyper_param_epoch = 100
-hyper_param_batch = 50
-hyper_param_learning_rate = 0.001
+  hyper_param_epoch = 100
+  hyper_param_batch = 50
+  hyper_param_learning_rate = 0.001
 
-transforms_train = transforms.Compose([transforms.Resize((360, 80)),
-                                       transforms.RandomRotation(10.),
-                                       transforms.ToTensor()])
+  transforms_train = transforms.Compose([transforms.Resize((360, 80)),
+                                        transforms.RandomRotation(10.),
+                                        transforms.ToTensor()])
 
-transforms_test = transforms.Compose([transforms.Resize((360, 80)),
-                                      transforms.ToTensor()])
+  transforms_test = transforms.Compose([transforms.Resize((360, 80)),
+                                        transforms.ToTensor()])
 
-train_data_set = CustomImageDataset(data_set_path="Dataset/train", transforms=transforms_train)
-train_loader = DataLoader(train_data_set, batch_size=hyper_param_batch, shuffle=True)
+  train_data_set = CustomImageDataset(data_set_path="Dataset/train", transforms=transforms_train)
+  train_loader = DataLoader(train_data_set, batch_size=hyper_param_batch, shuffle=True)
 
-test_data_set = CustomImageDataset(data_set_path="Dataset/test", transforms=transforms_test)
-test_loader = DataLoader(test_data_set, batch_size=hyper_param_batch, shuffle=True)
+  test_data_set = CustomImageDataset(data_set_path="Dataset/test", transforms=transforms_test)
+  test_loader = DataLoader(test_data_set, batch_size=hyper_param_batch, shuffle=True)
 
-if not (train_data_set.num_classes == test_data_set.num_classes):
-    print("error: Numbers of class in training set and test set are not equal")
+  if not (train_data_set.num_classes == test_data_set.num_classes):
+      print("error: Numbers of class in training set and test set are not equal")
 
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+  device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-num_classes = train_data_set.num_classes
-custom_model = CustomConvNet(num_classes=num_classes).to(device)
+  num_classes = train_data_set.num_classes
+  custom_model = CustomConvNet(num_classes=num_classes).to(device)
 
-# Loss and optimizer
-criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(custom_model.parameters(), lr=hyper_param_learning_rate)
-custom_model.train()
-for e in range(hyper_param_epoch):
-  for i_batch, item in enumerate(train_loader):
-    images = item['image'].to(device)
-    labels = item['label'].to(device)
+  # Loss and optimizer
+  criterion = nn.CrossEntropyLoss()
+  optimizer = torch.optim.Adam(custom_model.parameters(), lr=hyper_param_learning_rate)
+  custom_model.train()
+  for e in range(hyper_param_epoch):
+    for i_batch, item in enumerate(train_loader):
+      images = item['image'].to(device)
+      labels = item['label'].to(device)
+      
+      # Forward pass
+      outputs = custom_model(images)
+
+      loss = criterion(outputs, labels)
+      # Backward and optimize
+      optimizer.zero_grad()
+      loss.backward()
+      optimizer.step()
+      
+      
+      print('Epoch [{}/{}], Loss: {:.4f}'.format(e + 1, hyper_param_epoch, loss.item()))
+
+  # Test the model
+  custom_model.eval()  # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)
     
-    # Forward pass
-    outputs = custom_model(images)
+  np.set_printoptions(threshold=np.inf)
 
-    loss = criterion(outputs, labels)
-    # Backward and optimize
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
-    
-    
-    print('Epoch [{}/{}], Loss: {:.4f}'.format(e + 1, hyper_param_epoch, loss.item()))
+  summary(custom_model, (1, 360, 80))
+  with torch.no_grad():
+    correct = 0
+    total = 0
+    for item in test_loader:
+      images = item['image'].to(device)
+      labels = item['label'].to(device)
 
-# Test the model
-custom_model.eval()  # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)
-  
-np.set_printoptions(threshold=np.inf)
+      outputs = custom_model(images)
+      
+      _, predicted = torch.max(outputs.data, 1)
+      total += len(labels)
+      print('predicted : ',predicted, '\nlabels : ',labels)
+      correct += (predicted == labels).sum().item()
+    print('Test Accuracy of the model on the {} test images: {} %'.format(total, 100 * correct / total))
 
-summary(custom_model, (1, 360, 80))
-with torch.no_grad():
-  correct = 0
-  total = 0
-  for item in test_loader:
-    images = item['image'].to(device)
-    labels = item['label'].to(device)
-
-    outputs = custom_model(images)
-    
-    _, predicted = torch.max(outputs.data, 1)
-    total += len(labels)
-    print('predicted : ',predicted, '\nlabels : ',labels)
-    correct += (predicted == labels).sum().item()
-  print('Test Accuracy of the model on the {} test images: {} %'.format(total, 100 * correct / total))
-
-torch.save(custom_model.state_dict(), "model_cnn.pth")
+  torch.save(custom_model.state_dict(), "model_cnn.pth")

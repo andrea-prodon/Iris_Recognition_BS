@@ -7,7 +7,7 @@ import streamlit as st
 
 
 PREDICTION_SERVICE_HOSTNAME = '127.0.0.1'#os.environ["PREDICTION_SERVICE_HOSTNAME"]
-PREDICTION_SERVICE_PORT = '80'#os.environ["PREDICTION_SERVICE_PORT"]
+PREDICTION_SERVICE_PORT = '8000'#os.environ["PREDICTION_SERVICE_PORT"]
 
 st.set_page_config(
      page_title="Sign in with your iris?",

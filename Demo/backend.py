@@ -13,6 +13,8 @@ from Final.IrisLocalization import IrisLocalization
 from Final.IrisNormalization import IrisNormalization
 import joblib
 from cnn_feature.cnn_normal import CustomConvNet
+from preprocessing.normalization_cnn import cnn_normalization
+import cv2
 
 warnings.filterwarnings("ignore")
 
@@ -25,8 +27,9 @@ class IrisNotFoundException(Exception):
 
 @app.on_event("startup")
 def init_model() -> None:
-    app.model = torch.load("model_cnn.pth")
-
+    cnn = CustomConvNet(108)
+    cnn.load_state_dict(torch.load('model_cnn.pth'))
+    app.model = cnn.eval()
 
 
 @app.get('/')
@@ -41,10 +44,20 @@ def recognition(file: UploadFile):
     img = Image.open(file.file)
     np_image = np.array(img)
     try:
-        iris, pupil = IrisLocalization(img)
-        normalized = IrisNormalization(img, pupil, iris)
-        subject = app.model(normalized)
-        return JSONResponse(content={"subject": subject}, status_code=200)
+        normalized = cnn_normalization(np_image)
+        normalized = normalized.astype('float32',casting='same_kind')
+        normalized = torch.tensor(normalized).reshape(1,1,360,80)
+        #normalized = torch.repeat_interleave(normalized,3, dim=3)
+        print(normalized.shape)
+        
+        print(type(normalized), normalized.shape)
+        subject = 0
+        with torch.no_grad():
+            prediction = app.model(normalized)
+            _, predicted = torch.max(prediction.data, 1)
+
+        return JSONResponse(content={"subject": str(predicted)}, status_code=200)
+    
     except IrisNotFoundException:
         return Response(content="No face detected!", status_code=422)
 
