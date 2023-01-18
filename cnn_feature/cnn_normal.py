@@ -54,6 +54,7 @@ class CustomImageDataset(Dataset):
 
 class CustomConvNet(nn.Module): 
   def __init__(self, num_classes):
+    self.num_classes = num_classes
     super(CustomConvNet, self).__init__()
       
     self.layer1 = self.conv_module(1, 16)
@@ -70,7 +71,7 @@ class CustomConvNet(nn.Module):
     out = self.layer4(out)
     out = self.layer5(out)
     out = self.layer6(out)
-    out = out.view(-1, num_classes)
+    out = out.view(-1, self.num_classes)
     
     return out
   def conv_module(self, in_num, out_num):
