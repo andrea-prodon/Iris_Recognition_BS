@@ -7,6 +7,7 @@ from torch import nn
 from torchvision import transforms
 import numpy as np
 import ctypes
+import joblib
 
 #rete feed-forward. Prende l'input, lo alimenta attraverso diversi livelli uno dopo l'altro e infine fornisce l'output.
 #accuracy 95.6%
@@ -153,3 +154,5 @@ with torch.no_grad():
     print('predicted : ',predicted, '\nlabels : ',labels)
     correct += (predicted == labels).sum().item()
   print('Test Accuracy of the model on the {} test images: {} %'.format(total, 100 * correct / total))
+
+joblib.dump(custom_model, "model_cnn.py")

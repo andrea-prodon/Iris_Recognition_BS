@@ -11,6 +11,7 @@ from PIL import Image
 from torchvision import transforms
 from Final.IrisLocalization import IrisLocalization
 from Final.IrisNormalization import IrisNormalization
+import joblib
 
 warnings.filterwarnings("ignore")
 
@@ -23,7 +24,7 @@ class IrisNotFoundException(Exception):
 
 @app.on_event("startup")
 def init_model() -> None:
-    app.model = None
+    app.model = joblib.load("model_cnn.py")
 
 
 
