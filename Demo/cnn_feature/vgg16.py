@@ -9,6 +9,13 @@ from torchvision import datasets, transforms
 import argparse
 import numpy as np
 import sys
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning) 
+import matplotlib.pyplot as plt
+from sklearn import metrics
+from sklearn.metrics import precision_score, accuracy_score, recall_score, f1_score, confusion_matrix, ConfusionMatrixDisplay, classification_report, roc_curve, auc, RocCurveDisplay
+from sklearn.svm import SVC
 
 #accuracy --> Test Accuracy of the model on the 432 test images: 72.22222222222223 %
 
@@ -94,7 +101,7 @@ class CustomConvNet(nn.Module):
     out = self.fc3(out)
     return out
   
-hyper_param_epoch = 80
+hyper_param_epoch = 10
 hyper_param_batch = 50
 hyper_param_learning_rate = 0.001
 
@@ -143,13 +150,31 @@ summary(custom_model, (3, 360, 80))
 with torch.no_grad():
   correct = 0
   total = 0
+  y_true = []
+  y_pred = []
   for item in test_loader:
     images = item['image'].to(device)
     labels = item['label'].to(device)
-
     outputs = custom_model(images)
     _, predicted = torch.max(outputs.data, 1)
-    total += len(labels)
     print('predicted : ',predicted, '\nlabels : ',labels)
-    correct += (predicted == labels).sum().item()
-  print('Test Accuracy of the model on the {} test images: {} %'.format(total, 100 * correct / total))
+    labels = list(labels.numpy())
+    prediceted = list(predicted.numpy())
+    y_true += (labels)
+    y_pred += (predicted)
+
+  print('Accuracy score: ', accuracy_score(y_true, y_pred, sample_weight=None))
+  print('Precision score: ', precision_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
+  print('Recall score: ', recall_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
+  print('F score: ', f1_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
+  print(classification_report(y_true, y_pred, labels=None, target_names=None, sample_weight=None, digits=2, output_dict=False, zero_division=1))
+  confusion_matrix = confusion_matrix(y_true, y_pred)
+  print(confusion_matrix)
+  disp = ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=None)
+  disp.plot()
+  plt.show()
+  fpr, tpr, thresholds = roc_curve(y_true, y_pred, pos_label=1)
+  roc_auc = auc(fpr, tpr)
+  display = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name='example estimator')
+  display.plot()
+  plt.show()

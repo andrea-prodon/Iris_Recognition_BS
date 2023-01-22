@@ -8,6 +8,13 @@ from torchvision import transforms
 import numpy as np
 import ctypes
 import joblib
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning) 
+import matplotlib.pyplot as plt
+from sklearn import metrics
+from sklearn.metrics import precision_score, accuracy_score, recall_score, f1_score, confusion_matrix, ConfusionMatrixDisplay, classification_report, roc_curve, auc, RocCurveDisplay
+from sklearn.svm import SVC
 
 #rete feed-forward. Prende l'input, lo alimenta attraverso diversi livelli uno dopo l'altro e infine fornisce l'output.
 #accuracy 95.6%
@@ -89,8 +96,8 @@ class CustomConvNet(nn.Module):
       nn.AdaptiveAvgPool2d((1, 1)))
 
 
-hyper_param_epoch = 100
-hyper_param_batch = 50
+hyper_param_epoch = 50
+hyper_param_batch = 100
 hyper_param_learning_rate = 0.001
 
 transforms_train = transforms.Compose([transforms.Resize((360, 80)),
@@ -144,16 +151,37 @@ summary(custom_model, (1, 360, 80))
 with torch.no_grad():
   correct = 0
   total = 0
+  y_true = [] 
+  y_pred = []
   for item in test_loader:
     images = item['image'].to(device)
     labels = item['label'].to(device)
-
-    outputs = custom_model(images)
+    #train_label = np.array([sample['label'] for sample in train_loader], dtype="object")
+    #train_data = np.array([sample['image'].reshape(-1) for sample in train_loader])
+    #test_data = np.array([sample['image'].reshape(-1) for sample in test_loader], dtype="object")
+    #test_label = np.array([sample['label'] for sample in test_loader])
     
+    outputs = custom_model(images)
     _, predicted = torch.max(outputs.data, 1)
-    total += len(labels)
     print('predicted : ',predicted, '\nlabels : ',labels)
-    correct += (predicted == labels).sum().item()
-  print('Test Accuracy of the model on the {} test images: {} %'.format(total, 100 * correct / total))
+    labels = list(labels.numpy())
+    prediceted = list(predicted.numpy())
+    y_true += (labels)
+    y_pred += (predicted)
+
+  print('Accuracy score: ', accuracy_score(y_true, y_pred, sample_weight=None))
+  print('Precision score: ', precision_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
+  print('Recall score: ', recall_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
+  print('F score: ', f1_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
+  print(classification_report(y_true, y_pred, labels=None, target_names=None, sample_weight=None, digits=2, output_dict=False, zero_division=1))
+  confusion_matrix = confusion_matrix(y_true, y_pred)
+  disp = ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=None)
+  disp.plot()
+  plt.show()
+  fpr, tpr, thresholds = roc_curve(y_true, y_pred, pos_label=1)
+  roc_auc = auc(fpr, tpr)
+  display = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name='example estimator')
+  display.plot()
+  plt.show()
 
 torch.save(custom_model.state_dict(), "model_cnn.pth")

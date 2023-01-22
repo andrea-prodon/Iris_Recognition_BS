@@ -52,6 +52,7 @@ endtime = datetime.datetime.now()
 print ('image processing and feature extraction takes '+str((endtime-starttime).seconds)+' seconds')
 
 
+
 PE.table_CRR(train_features, train_classes, test_features, test_classes)
 PE.performance_evaluation(train_features, train_classes, test_features, test_classes)
 #thresholds_2=[0.74,0.76,0.78]
