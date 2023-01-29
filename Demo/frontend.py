@@ -39,6 +39,6 @@ if submitted and uploaded_image is not None:
                     response_dict = response.json()
                     st.success(f'Welcome {response_dict["subject"]}')
                 elif response.status_code == 422:
-                    st.error("No iris detected")
+                    st.error(response.content)
                 elapsed_time = time.time() - start_time
     st.success('Done in %.2fs' % elapsed_time)

@@ -100,81 +100,82 @@ class CustomConvNet(nn.Module):
     out = self.fc2(out)
     out = self.fc3(out)
     return out
-  
-hyper_param_epoch = 10
-hyper_param_batch = 50
-hyper_param_learning_rate = 0.001
 
-transforms_train = transforms.Compose([transforms.Resize((360, 80)),
-                                       transforms.RandomRotation(10.),
-                                       transforms.ToTensor()])
+if __name__ == '__main__':  
+  hyper_param_epoch = 10
+  hyper_param_batch = 50
+  hyper_param_learning_rate = 0.001
 
-transforms_test = transforms.Compose([transforms.Resize((360, 80)),
-                                      transforms.ToTensor()])
+  transforms_train = transforms.Compose([transforms.Resize((360, 80)),
+                                        transforms.RandomRotation(10.),
+                                        transforms.ToTensor()])
 
-train_data_set = CustomImageDataset(data_set_path="Dataset/train", transforms=transforms_train)
-train_loader = DataLoader(train_data_set, batch_size=hyper_param_batch, shuffle=True)
+  transforms_test = transforms.Compose([transforms.Resize((360, 80)),
+                                        transforms.ToTensor()])
 
-test_data_set = CustomImageDataset(data_set_path="Dataset/test", transforms=transforms_test)
-test_loader = DataLoader(test_data_set, batch_size=hyper_param_batch, shuffle=True)
+  train_data_set = CustomImageDataset(data_set_path="Dataset/train", transforms=transforms_train)
+  train_loader = DataLoader(train_data_set, batch_size=hyper_param_batch, shuffle=True)
 
-
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
-num_classes = train_data_set.num_classes
-custom_model = CustomConvNet(num_classes=num_classes).to(device)
+  test_data_set = CustomImageDataset(data_set_path="Dataset/test", transforms=transforms_test)
+  test_loader = DataLoader(test_data_set, batch_size=hyper_param_batch, shuffle=True)
 
 
-criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(custom_model.parameters(), lr=hyper_param_learning_rate)
+  device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
+  num_classes = train_data_set.num_classes
+  custom_model = CustomConvNet(num_classes=num_classes).to(device)
 
 
-for e in range(hyper_param_epoch):
-  for i_batch, item in enumerate(train_loader):
-    images = item['image'].to(device)
-    labels = item['label'].to(device)
-    
-    outputs = custom_model(images)
-    loss = criterion(outputs, labels)
+  criterion = nn.CrossEntropyLoss()
+  optimizer = torch.optim.Adam(custom_model.parameters(), lr=hyper_param_learning_rate)
 
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
 
-  print('Epoch [{}/{}], Loss: {:.4f}'.format(e + 1, hyper_param_epoch, loss.item()))
+  for e in range(hyper_param_epoch):
+    for i_batch, item in enumerate(train_loader):
+      images = item['image'].to(device)
+      labels = item['label'].to(device)
+      
+      outputs = custom_model(images)
+      loss = criterion(outputs, labels)
 
-custom_model.eval()
+      optimizer.zero_grad()
+      loss.backward()
+      optimizer.step()
 
-summary(custom_model, (3, 360, 80))
+    print('Epoch [{}/{}], Loss: {:.4f}'.format(e + 1, hyper_param_epoch, loss.item()))
 
-with torch.no_grad():
-  correct = 0
-  total = 0
-  y_true = []
-  y_pred = []
-  for item in test_loader:
-    images = item['image'].to(device)
-    labels = item['label'].to(device)
-    outputs = custom_model(images)
-    _, predicted = torch.max(outputs.data, 1)
-    print('predicted : ',predicted, '\nlabels : ',labels)
-    labels = list(labels.numpy())
-    prediceted = list(predicted.numpy())
-    y_true += (labels)
-    y_pred += (predicted)
+  custom_model.eval()
 
-  print('Accuracy score: ', accuracy_score(y_true, y_pred, sample_weight=None))
-  print('Precision score: ', precision_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
-  print('Recall score: ', recall_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
-  print('F score: ', f1_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
-  print(classification_report(y_true, y_pred, labels=None, target_names=None, sample_weight=None, digits=2, output_dict=False, zero_division=1))
-  confusion_matrix = confusion_matrix(y_true, y_pred)
-  print(confusion_matrix)
-  disp = ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=None)
-  disp.plot()
-  plt.show()
-  fpr, tpr, thresholds = roc_curve(y_true, y_pred, pos_label=1)
-  roc_auc = auc(fpr, tpr)
-  display = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name='example estimator')
-  display.plot()
-  plt.show()
+  summary(custom_model, (3, 360, 80))
+
+  with torch.no_grad():
+    correct = 0
+    total = 0
+    y_true = []
+    y_pred = []
+    for item in test_loader:
+      images = item['image'].to(device)
+      labels = item['label'].to(device)
+      outputs = custom_model(images)
+      _, predicted = torch.max(outputs.data, 1)
+      print('predicted : ',predicted, '\nlabels : ',labels)
+      labels = list(labels.numpy())
+      prediceted = list(predicted.numpy())
+      y_true += (labels)
+      y_pred += (predicted)
+
+    print('Accuracy score: ', accuracy_score(y_true, y_pred, sample_weight=None))
+    print('Precision score: ', precision_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
+    print('Recall score: ', recall_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
+    print('F score: ', f1_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
+    print(classification_report(y_true, y_pred, labels=None, target_names=None, sample_weight=None, digits=2, output_dict=False, zero_division=1))
+    confusion_matrix = confusion_matrix(y_true, y_pred)
+    print(confusion_matrix)
+    disp = ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=None)
+    disp.plot()
+    plt.show()
+    fpr, tpr, thresholds = roc_curve(y_true, y_pred, pos_label=1)
+    roc_auc = auc(fpr, tpr)
+    display = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name='example estimator')
+    display.plot()
+    plt.show()

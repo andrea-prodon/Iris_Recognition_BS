@@ -34,7 +34,7 @@ for i in range(1,109):
         iris, pupil = IrisLocalization(img)
         normalized = IrisNormalization(img, pupil, iris)
         ROI = ImageEnhancement(normalized)
-#eseguiamo l'estrazione delle caratteristiche 
+        #eseguiamo l'estrazione delle caratteristiche 
         train_features[(i-1)*3+j-1, :] = FeatureExtraction(ROI)
         train_classes[(i-1)*3+j-1] = i
     for k in range(1,5):
@@ -43,7 +43,7 @@ for i in range(1,109):
         iris, pupil = IrisLocalization(img)
         normalized = IrisNormalization(img, pupil, iris)
         ROI = ImageEnhancement(normalized)
-#eseguiamo l'estrazione delle caratteristiche 
+        #eseguiamo l'estrazione delle caratteristiche 
         test_features[(i-1)*4+k-1, :] = FeatureExtraction(ROI)
         test_classes[(i-1)*4+k-1] = i
 
@@ -66,7 +66,7 @@ fmrs_mean,fmrs_l,fmrs_u,fnmrs_mean,fnmrs_l,fnmrs_u = IM.calcROCBootstrap(total_f
 
 endtime = datetime.datetime.now()
 
-print ('Bootsrap takes'+str((endtime-starttime).seconds) + 'seconds')
+print ('Bootstrap takes'+str((endtime-starttime).seconds) + 'seconds')
 
 fmrs_mean *= 100  #use for percent(%)
 fmrs_l *= 100

@@ -95,93 +95,93 @@ class CustomConvNet(nn.Module):
       nn.LeakyReLU(),
       nn.AdaptiveAvgPool2d((1, 1)))
 
+if __name__ == '__main__':
+  hyper_param_epoch = 100
+  hyper_param_batch = 100
+  hyper_param_learning_rate = 0.001
 
-hyper_param_epoch = 100
-hyper_param_batch = 100
-hyper_param_learning_rate = 0.001
+  transforms_train = transforms.Compose([transforms.Resize((360, 80)),
+                                        transforms.RandomRotation(10.),
+                                        transforms.ToTensor()])
 
-transforms_train = transforms.Compose([transforms.Resize((360, 80)),
-                                       transforms.RandomRotation(10.),
-                                       transforms.ToTensor()])
+  transforms_test = transforms.Compose([transforms.Resize((360, 80)),
+                                        transforms.ToTensor()])
 
-transforms_test = transforms.Compose([transforms.Resize((360, 80)),
-                                      transforms.ToTensor()])
+  train_data_set = CustomImageDataset(data_set_path="Dataset/train", transforms=transforms_train)
+  train_loader = DataLoader(train_data_set, batch_size=hyper_param_batch, shuffle=True)
 
-train_data_set = CustomImageDataset(data_set_path="Dataset/train", transforms=transforms_train)
-train_loader = DataLoader(train_data_set, batch_size=hyper_param_batch, shuffle=True)
+  test_data_set = CustomImageDataset(data_set_path="Dataset/test", transforms=transforms_test)
+  test_loader = DataLoader(test_data_set, batch_size=hyper_param_batch, shuffle=True)
 
-test_data_set = CustomImageDataset(data_set_path="Dataset/test", transforms=transforms_test)
-test_loader = DataLoader(test_data_set, batch_size=hyper_param_batch, shuffle=True)
+  if not (train_data_set.num_classes == test_data_set.num_classes):
+      print("error: Numbers of class in training set and test set are not equal")
 
-if not (train_data_set.num_classes == test_data_set.num_classes):
-    print("error: Numbers of class in training set and test set are not equal")
+  device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+  num_classes = train_data_set.num_classes
+  custom_model = CustomConvNet(num_classes=num_classes).to(device)
 
-num_classes = train_data_set.num_classes
-custom_model = CustomConvNet(num_classes=num_classes).to(device)
+  # Loss and optimizer
+  criterion = nn.CrossEntropyLoss()
+  optimizer = torch.optim.Adam(custom_model.parameters(), lr=hyper_param_learning_rate)
+  custom_model.train()
+  for e in range(hyper_param_epoch):
+    for i_batch, item in enumerate(train_loader):
+      images = item['image'].to(device)
+      labels = item['label'].to(device)
+      
+      # Forward pass
+      outputs = custom_model(images)
 
-# Loss and optimizer
-criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(custom_model.parameters(), lr=hyper_param_learning_rate)
-custom_model.train()
-for e in range(hyper_param_epoch):
-  for i_batch, item in enumerate(train_loader):
-    images = item['image'].to(device)
-    labels = item['label'].to(device)
+      loss = criterion(outputs, labels)
+      # Backward and optimize
+      optimizer.zero_grad()
+      loss.backward()
+      optimizer.step()
+      
+      
+      print('Epoch [{}/{}], Loss: {:.4f}'.format(e + 1, hyper_param_epoch, loss.item()))
+
+  # Test the model
+  custom_model.eval()  # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)
     
-    # Forward pass
-    outputs = custom_model(images)
+  np.set_printoptions(threshold=np.inf)
 
-    loss = criterion(outputs, labels)
-    # Backward and optimize
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
-    
-    
-    print('Epoch [{}/{}], Loss: {:.4f}'.format(e + 1, hyper_param_epoch, loss.item()))
+  summary(custom_model, (1, 360, 80))
+  with torch.no_grad():
+    correct = 0
+    total = 0
+    y_true = [] 
+    y_pred = []
+    for item in test_loader:
+      images = item['image'].to(device)
+      labels = item['label'].to(device)
+      #train_label = np.array([sample['label'] for sample in train_loader], dtype="object")
+      #train_data = np.array([sample['image'].reshape(-1) for sample in train_loader])
+      #test_data = np.array([sample['image'].reshape(-1) for sample in test_loader], dtype="object")
+      #test_label = np.array([sample['label'] for sample in test_loader])
+      
+      outputs = custom_model(images)
+      _, predicted = torch.max(outputs.data, 1)
+      print('predicted : ',predicted, '\nlabels : ',labels)
+      labels = list(labels.numpy())
+      prediceted = list(predicted.numpy())
+      y_true += (labels)
+      y_pred += (predicted)
 
-# Test the model
-custom_model.eval()  # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)
-  
-np.set_printoptions(threshold=np.inf)
+    print('Accuracy score: ', accuracy_score(y_true, y_pred, sample_weight=None))
+    print('Precision score: ', precision_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
+    print('Recall score: ', recall_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
+    print('F score: ', f1_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
+    print(classification_report(y_true, y_pred, labels=None, target_names=None, sample_weight=None, digits=2, output_dict=False, zero_division=1))
+    confusion_matrix = confusion_matrix(y_true, y_pred)
+    disp = ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=None)
+    disp.plot()
+    plt.show()
+    fpr, tpr, thresholds = roc_curve(y_true, y_pred, pos_label=1)
+    roc_auc = auc(fpr, tpr)
+    display = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name='example estimator')
+    display.plot()
+    plt.show()
 
-summary(custom_model, (1, 360, 80))
-with torch.no_grad():
-  correct = 0
-  total = 0
-  y_true = [] 
-  y_pred = []
-  for item in test_loader:
-    images = item['image'].to(device)
-    labels = item['label'].to(device)
-    #train_label = np.array([sample['label'] for sample in train_loader], dtype="object")
-    #train_data = np.array([sample['image'].reshape(-1) for sample in train_loader])
-    #test_data = np.array([sample['image'].reshape(-1) for sample in test_loader], dtype="object")
-    #test_label = np.array([sample['label'] for sample in test_loader])
-    
-    outputs = custom_model(images)
-    _, predicted = torch.max(outputs.data, 1)
-    print('predicted : ',predicted, '\nlabels : ',labels)
-    labels = list(labels.numpy())
-    prediceted = list(predicted.numpy())
-    y_true += (labels)
-    y_pred += (predicted)
-
-  print('Accuracy score: ', accuracy_score(y_true, y_pred, sample_weight=None))
-  print('Precision score: ', precision_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
-  print('Recall score: ', recall_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
-  print('F score: ', f1_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
-  print(classification_report(y_true, y_pred, labels=None, target_names=None, sample_weight=None, digits=2, output_dict=False, zero_division=1))
-  confusion_matrix = confusion_matrix(y_true, y_pred)
-  disp = ConfusionMatrixDisplay(confusion_matrix=confusion_matrix, display_labels=None)
-  disp.plot()
-  plt.show()
-  fpr, tpr, thresholds = roc_curve(y_true, y_pred, pos_label=1)
-  roc_auc = auc(fpr, tpr)
-  display = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name='example estimator')
-  display.plot()
-  plt.show()
-
-torch.save(custom_model.state_dict(), "model_cnn.pth")
+  torch.save(custom_model.state_dict(), "model_cnn.pth")

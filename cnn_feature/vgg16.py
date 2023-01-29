@@ -101,7 +101,7 @@ class CustomConvNet(nn.Module):
     out = self.fc3(out)
     return out
   
-hyper_param_epoch = 10
+hyper_param_epoch = 100
 hyper_param_batch = 50
 hyper_param_learning_rate = 0.001
 
@@ -158,10 +158,10 @@ with torch.no_grad():
     outputs = custom_model(images)
     _, predicted = torch.max(outputs.data, 1)
     print('predicted : ',predicted, '\nlabels : ',labels)
-    labels = list(labels.numpy())
-    prediceted = list(predicted.numpy())
+    labels = list(labels.cpu().numpy())
+    prediceted = list(predicted.cpu().numpy())
     y_true += (labels)
-    y_pred += (predicted)
+    y_pred += (prediceted)
 
   print('Accuracy score: ', accuracy_score(y_true, y_pred, sample_weight=None))
   print('Precision score: ', precision_score(y_true, y_pred, labels=None, pos_label=1, average='macro', sample_weight=None, zero_division=1))
