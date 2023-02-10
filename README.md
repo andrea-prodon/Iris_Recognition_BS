@@ -5,6 +5,7 @@ Progetto per il corso "Biometric Systems" presso Sapienza Università di Roma
 Contenuto delle cartelle:
 
 • Dataset:
+
     • CASIA1:                   108 cartelle ciascuna contenente 7 diverse foto dello stesso occhio, catturate in 2 sessioni
     • CASIA_Iris_interval_norm: contiene i risultati delle immagini normalizzate organizzate nelle corrispondenti cartelle del database di partenza CASIA1
 
