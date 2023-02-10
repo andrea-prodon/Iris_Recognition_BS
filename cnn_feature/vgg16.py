@@ -102,7 +102,7 @@ class CustomConvNet(nn.Module):
     return out
   
 hyper_param_epoch = 100
-hyper_param_batch = 50
+hyper_param_batch = 100
 hyper_param_learning_rate = 0.001
 
 transforms_train = transforms.Compose([transforms.Resize((360, 80)),

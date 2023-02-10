@@ -96,7 +96,7 @@ class CustomConvNet(nn.Module):
       nn.AdaptiveAvgPool2d((1, 1)))
 
 
-hyper_param_epoch = 50
+hyper_param_epoch = 100
 hyper_param_batch = 100
 hyper_param_learning_rate = 0.001
 
